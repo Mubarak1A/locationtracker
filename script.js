@@ -1,43 +1,80 @@
-const showDetails = document.querySelector(".showDetails");
-const fullAddress = document.querySelector(".fullAddress");
+document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.querySelector(".flipcard-front form");
+    const signupForm = document.querySelector(".flipcard-back form");
 
-let apiEndpoint = "https://api.opencagedata.com/geocode/v1/json";
-let apiKey = "4f60eb38f64c4f26a5424f42b15c2f7b";
+    // Prevent default action for login button
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        // Call function to make POST request for login verification
+        loginUser(loginForm);
+    });
 
-const getCurrentAddress = async (latitude, longitude) => {
-    let query = `${latitude},${longitude}`;
-    let apiUrl = `${apiEndpoint}?key=${apiKey}&q=${query}&pretty=1`;
-    try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        fullAddress.textContent = `User Address: ${data.results[0].formatted}`;
-    } catch (error) {
-        console.log(error);
-    }
-};
+    // Prevent default action for signup button
+    signupForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        // Call function to make POST request for signup verification
+        signupUser(signupForm);
+    });
 
-document.querySelector(".geo-btn").addEventListener("click", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                showDetails.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
-                getCurrentAddress(latitude, longitude);
+    function loginUser(form) {
+        // Extract email and password from the form
+        const email = form.querySelector('input[name="email"]').value;
+        const password = form.querySelector('input[name="password"]').value;
+
+        // Make POST request to API for login verification
+        fetch('your_login_endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            (error) => {
-                showDetails.textContent = error.message;
-                console.log(error.message);
+            body: JSON.stringify({
+                email: email,
+                password: password
+            }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to next app page upon successful login
+                window.location.href = "next_app_page.html";
+            } else {
+                // Handle login error
+                alert("Login failed. Please try again.");
             }
-        );
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
-});
 
-const signupBtn = document.getElementById("signup");
-signupBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById('signup-email')
-    const name = document.getElementById('signup-name')
-    const password = document.getElementById('signup-password')
+    function signupUser(form) {
+        // Extract email, name, and password from the form
+        const email = form.querySelector('#signup-email').value;
+        const name = form.querySelector('#signup-name').value;
+        const password = form.querySelector('#signup-password').value;
 
-    console.log(`${email.value} ${name.value} ${password.value}`)
+        // Make POST request to API for signup verification
+        fetch('your_signup_endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                name: name,
+                password: password
+            }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to successful signup page upon successful signup
+                window.location.href = "successfulsignup.html";
+            } else {
+                // Handle signup error
+                alert("Signup failed. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 });
